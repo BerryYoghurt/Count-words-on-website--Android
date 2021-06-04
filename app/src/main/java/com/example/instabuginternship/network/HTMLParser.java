@@ -12,7 +12,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-/**Assumes the webpage is well-formed and can be treated as XML*/
+/**Assumes the webpage is well-formed and can be treated as XML
+ * deprecated two days after its creation because making and HTML parser is almost impossible*/
+@Deprecated
 public class HTMLParser {
     private Map<String, Integer> map;
     XmlPullParser parser;

@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.instabuginternship.network.BackgroundTasks;
 import com.example.instabuginternship.network.NetworkHandler;
 import com.example.instabuginternship.R;
 
@@ -15,27 +16,25 @@ import java.util.Map;
 
 public class SearchResultActivity extends AppCompatActivity {
 
+    private static final String TAG = "SearchResultActivity";
     private Map<String,Integer> map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_result_activity);
-        map = NetworkHandler.getMap();
-        Log.d("SearchResultActivity","onCreate");
+        map = BackgroundTasks.getMap();
+        Log.d(TAG,"onCreate");
         doSearch(getIntent());
     }
 
-    @Override
-    protected void onNewIntent(Intent intent){
-        super.onNewIntent(intent);
-        doSearch(intent);
-    }
 
     private void doSearch(Intent intent){
-        if(intent.getAction().equals(Intent.ACTION_SEARCH)){
+        if(map == null){
+            finish();
+        }else if(intent.getAction().equals(Intent.ACTION_SEARCH)){
             String query = intent.getStringExtra(SearchManager.QUERY);
-            Integer count = map.get(query);
+            Integer count = map.get(query.toLowerCase());
             if(count == null)
                 count = 0;
             TextView textView = findViewById(R.id.tv_searchResult);

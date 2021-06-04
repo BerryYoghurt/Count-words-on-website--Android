@@ -4,8 +4,10 @@ import android.util.Log;
 
 import com.example.instabuginternship.ui.MainActivity;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,6 +16,8 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
+/**No need for this class, moved everything to backgroundtasks to be more succinct*/
+@Deprecated
 public class NetworkHandler implements Runnable{
 
     private final URL url;
@@ -26,25 +30,49 @@ public class NetworkHandler implements Runnable{
         this.activity = activity;
     }
 
+    public void parse(String text){
+        Map<String,Integer> map = new HashMap<>();
+        String[] words = text.split("[ \t\n]");
+        for(String word : words){
+            if(!word.isEmpty()) {
+                if (map.containsKey(word.toLowerCase())) {
+                    map.put(word.toLowerCase(), map.get(word.toLowerCase()) + 1);
+                } else {
+                    map.put(word.toLowerCase(), 0);
+                }
+            }
+        }
+    }
+
 
     @Override
     public void run() {
-        if(false){ //TODO I cannot parse HTML for now, so ignore the real parsing work
-            HttpURLConnection httpsURLConnection = null;
-            InputStream in = null;
-            try{
-                httpsURLConnection = (HttpsURLConnection) url.openConnection();
-                in = httpsURLConnection.getInputStream();
-                HTMLParser parser = new HTMLParser(in);
-                map = parser.getMap();
-                activity.runOnUiThread(() -> activity.loadedCallback(map));
-            }catch (IOException e){
-                Log.d("HTTPS Connection",Log.getStackTraceString(e));
-            }finally {
-                if(httpsURLConnection != null)
-                    httpsURLConnection.disconnect();
+        //if(false){ //TODO I cannot parse HTML for now, so ignore the real parsing work
+        HttpURLConnection httpsURLConnection = null;
+        InputStream in = null;
+        try{
+            /*get HTML*/
+            httpsURLConnection = (HttpsURLConnection) url.openConnection();
+            in = httpsURLConnection.getInputStream();
+            String type = httpsURLConnection.getContentType();
+            String encoding = httpsURLConnection.getContentEncoding();
+            StringBuilder sb = new StringBuilder();
+            try(BufferedReader br = new BufferedReader(new InputStreamReader(in))){
+                String line;
+                while((line = br.readLine()) != null){
+                    sb.append(line);
+                    sb.append(" ");
+                }
             }
-        }else{
+
+            activity.runOnUiThread(() -> activity.loadedCallback(map));
+        }catch (IOException e){
+            Log.d("HTTPS Connection",Log.getStackTraceString(e));
+        }finally {
+            if(httpsURLConnection != null)
+                httpsURLConnection.disconnect();
+        }
+        /*}else{
             try {
                 Thread.sleep(5000);
                 createDummyMap();
@@ -53,7 +81,7 @@ public class NetworkHandler implements Runnable{
                 Log.d("SLEEP interrupted", Log.getStackTraceString(e));
             }
 
-        }
+        }*/
 
 
     }

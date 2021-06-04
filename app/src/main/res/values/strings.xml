@@ -3,5 +3,5 @@
     <string name="search">Search</string>
     <string name="sort">Sort</string>
     <string name="search_hint">Search for a word</string>
-    <string name="search_result">%1$s was found %2$d time(s)</string>
+    <string name="search_result">"%1$s" was found %2$d time(s)</string>
 </resources>
